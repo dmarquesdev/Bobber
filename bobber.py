@@ -228,13 +228,18 @@ def execute_authentication(estscookie, username, resourceUri, clientId, redirect
                 commandLine = shlex.split(commandLine)
 
             # Execute the TeamFiltration command
-            process = subprocess.Popen(commandLine,  stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            process = subprocess.Popen(commandLine, stdin=subprocess.PIPE,  stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             
             # Read and display the output line by line
             for line in iter(process.stdout.readline, ''):
                 print(line.strip())
+                if "(Y/N)" in line:
+                    process.stdin.write('Y\n')
+                    process.stdin.flush()
+            
             # Wait for the process to finish and get the output
             stdout, stderr = process.communicate()
+            process.stdin.flush()
             if stdout:
                 print(stdout.strip())
             if stderr:
